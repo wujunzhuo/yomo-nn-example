@@ -1,5 +1,7 @@
 # yomo-nn-example
 
+https://github.com/yomorun/yomo#1-install-cli
+
 ## 1. zipper
 
 ```sh
@@ -20,6 +22,8 @@ yomo run --name sink main.go
 cd mobilenet_onnx
 
 curl -O https://media.githubusercontent.com/media/onnx/models/main/vision/classification/mobilenet/model/mobilenetv2-7.onnx
+
+rustup target add wasm32-wasi
 
 cargo build --release --target wasm32-wasi
 
