@@ -66,11 +66,10 @@ fn handler(ctx: yomo::Context) -> Result<()> {
     let model = unsafe { GLOBAL_MODEL.lock().unwrap() };
     let pred = model.as_ref().unwrap().run(tvec!(image.into()))?;
     let best = pred[0]
-        .to_array_view::<f32>()
-        .unwrap()
+        .to_array_view::<f32>()?
         .iter()
         .cloned()
-        .zip(2..)
+        .zip(0..)
         .max_by(|a, b| a.0.partial_cmp(&b.0).unwrap())
         .unwrap();
 

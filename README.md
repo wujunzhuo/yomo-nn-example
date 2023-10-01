@@ -27,7 +27,9 @@ yomo run mobilenet_onnx/target/wasm32-wasi/release/sfn.wasm
 ## 3. send image and receive the infernce result
 
 ```sh
+# build
 go build -o cli ./cmd
 
+# choose a picture for prediction
 ./cli sample.png
 ```

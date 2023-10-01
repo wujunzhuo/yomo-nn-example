@@ -1,6 +1,7 @@
 package main
 
 import (
+	"demo"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -72,5 +73,5 @@ func main() {
 	fmt.Printf("%s send image: %s\n", PREFIX, inputImage)
 
 	result := <-ch
-	fmt.Printf("%s inference result: score=%f, class=%d\n", PREFIX, result.Score, result.Class)
+	fmt.Printf("%s inference result: score=%f, class=[%s]\n", PREFIX, result.Score, demo.CLASS_NAMES[result.Class])
 }
