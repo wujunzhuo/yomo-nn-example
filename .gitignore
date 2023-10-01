@@ -12,4 +12,4 @@ Cargo.lock
 .DS_Store
 .vscode
 *.onnx
-*.yomo
+cli

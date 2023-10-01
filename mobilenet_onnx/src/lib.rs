@@ -21,8 +21,8 @@ static mut GLOBAL_MODEL: Mutex<
 > = Mutex::new(None);
 
 #[yomo::init]
-fn init() -> Result<Vec<u32>> {
-    println!("{}successufully loading model from file", LOG_PREFIX);
+fn init() -> Result<()> {
+    println!("{}loading model from file", LOG_PREFIX);
     // https://github.com/onnx/models/blob/main/vision/classification/mobilenet/model/mobilenetv2-7.onnx
     let mut file = OpenOptions::new().read(true).open("./mobilenetv2-7.onnx")?;
 
@@ -33,9 +33,14 @@ fn init() -> Result<Vec<u32>> {
     unsafe {
         GLOBAL_MODEL = Some(model).into();
     }
-    println!("{}successufully loaded model", LOG_PREFIX);
+    println!("{}init done", LOG_PREFIX);
 
-    Ok(vec![0x33])
+    Ok(())
+}
+
+#[yomo::observe_datatags]
+fn observe_datatags() -> Vec<u32> {
+    vec![0x33]
 }
 
 #[derive(Serialize)]
@@ -45,9 +50,10 @@ struct ImageResult {
 }
 
 #[yomo::handler]
-fn handler(input: &[u8]) -> Result<(u32, Vec<u8>)> {
+fn handler(ctx: yomo::Context) -> Result<()> {
     println!("{}processing image", LOG_PREFIX);
-    let image = load_from_memory(input)?.to_rgb8();
+    let input = ctx.load_input();
+    let image = load_from_memory(&input)?.to_rgb8();
     let resized = resize(&image, 224, 224, FilterType::Triangle);
     let image: Tensor = tract_ndarray::Array4::from_shape_fn((1, 3, 224, 224), |(_, c, y, x)| {
         let mean = [0.485, 0.456, 0.406][c];
@@ -73,7 +79,9 @@ fn handler(input: &[u8]) -> Result<(u32, Vec<u8>)> {
         class: best.1,
     };
     let output = serde_json::to_vec(&result)?;
-    println!("{}finished", LOG_PREFIX);
 
-    Ok((0x34, output))
+    ctx.dump_output(0x34, output);
+    println!("{}inference finished", LOG_PREFIX);
+
+    Ok(())
 }

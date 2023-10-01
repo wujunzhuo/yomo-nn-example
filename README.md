@@ -1,39 +1,33 @@
 # yomo-nn-example
 
-https://github.com/yomorun/yomo#1-install-cli
+## 1. Install YoMo Cli
 
-## 1. zipper
+https://yomo.run/docs#install-cli
+
+## 2. run YoMo Zipper
 
 ```sh
-yomo serve -c workflow.yaml
+yomo serve -c config.yaml
 ```
 
-## 2. sink
+## 2. mobilenet_onnx: the serverless function to make AI inference
 
 ```sh
-cd sink
-
-yomo run --name sink main.go
-```
-
-## 3. mobilenet_onnx
-
-```sh
-cd mobilenet_onnx
-
+# download the ONNX model
 curl -O https://media.githubusercontent.com/media/onnx/models/main/vision/classification/mobilenet/model/mobilenetv2-7.onnx
 
+# compile the serverless function to WebAssembly file
 rustup target add wasm32-wasi
+cargo build --release --target wasm32-wasi --manifest-path=mobilenet_onnx/Cargo.toml
 
-cargo build --release --target wasm32-wasi
-
-yomo run --name mobilenet_onnx target/wasm32-wasi/release/sfn.wasm
+# run the serverless function
+yomo run mobilenet_onnx/target/wasm32-wasi/release/sfn.wasm
 ```
 
-## 4. source
+## 3. send image and receive the infernce result
 
 ```sh
-cd source
+go build -o cli ./cmd
 
-go run main.go
+./cli sample.png
 ```
